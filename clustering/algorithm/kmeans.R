@@ -1,5 +1,5 @@
 partitionMatrix <- NULL
-KMEANS_ERROR <- 0.001
+KMEANS_ERROR <- 0.0001
 KMEANS_MAX_NUM_ITERATIONS <- 200;
 kmeansPrototypes <- NULL
 
@@ -27,7 +27,10 @@ shouldStop <- function(oldCentroid, newCentroid, iterations) {
   if (is.null(oldCentroid)) return(FALSE)
   
   #check if the difference between the prototypes are not smalled than our error
-  isPrototypeStable <- all(abs(oldCentroid - newCentroid) < KMEANS_ERROR)
+  difference <- abs(oldCentroid - newCentroid)
+  print("diff:")
+  print(difference)
+  isPrototypeStable <- all(difference < KMEANS_ERROR)
   if (KMEANS_MAX_NUM_ITERATIONS <= iterations || isPrototypeStable) {
     printf("parou: iteracoes: %s ficou estavel: %s", iterations, isPrototypeStable)
     return(TRUE)

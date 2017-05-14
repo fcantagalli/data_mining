@@ -10,7 +10,8 @@ main <- function() {
   #graph
   library(ggplot2)
   ggplot(iris, aes(Petal.Length, Petal.Width)) + geom_point(color = partitionMatrix) + 
-    geom_point(data=kmeansPrototypes, aes(Petal.Length, Petal.Width), color = "blue", shape = 17, size = 2)
+    geom_point(data=kmeansPrototypes, aes(Petal.Length, Petal.Width), color = "green", shape = 17, size = 2)
+  
 }
 
 main()
