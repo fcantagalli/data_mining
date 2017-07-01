@@ -16,8 +16,8 @@ minmax <- datasetMinMax(dataset)
 dataset <- normalizeDataset(dataset, minmax)
 
 n_classifiers <- 5
-l_rate <- 0.4
-n_epoch <- 10
+l_rate <- 0.3
+n_epoch <- 400
 list_of_n_hidden <- c(5, 5, 5, 5, 5)
 
 scores <- EN.evaluateAlgorithm(dataset, EN.trainTestEnsembleMPL, n_classifiers, l_rate, n_epoch, list_of_n_hidden)
