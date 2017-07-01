@@ -80,7 +80,6 @@ backwardPropagateError <- function(network, expected) {
         #calculate the error for the hidden layer
         error <- 0.0
         for (upperNeuron in network[[i +1]]) {
-        #for (upperNeuronIndex in 1:length(network[[i + 1]])) {
           error <- error + (upperNeuron$weights[j] * upperNeuron$delta)
         }
         #append error to the output
@@ -137,15 +136,19 @@ trainNetwork <- function(network, train_dataset, l_rate, n_epoch, n_outputs) {
       outputs <- getNetworkOutputs(network)
       expected <- rep(0, n_outputs)
       expected[row[length(row)]] <- 1
+      #print(row[length(row)])
+      #print(expected)
+      #print(outputs)
       sum_error <- sum_error + sum((expected - outputs)^2)
       network <- backwardPropagateError(network, expected)
       network <- updateNetworkWeights(network, row, l_rate)
     }
-    printf('>epoch=%d, lrate=%.3f, error=%.3f',epoch, l_rate, sum_error)
-    if (sum_error < 3.00) {
-      break;
-    }
+    
+    #if (sum_error < 3.00) {
+    #  break;
+    #}
   }
+  printf('>epoch=%d, lrate=%.3f, error=%.3f',epoch, l_rate, sum_error)
   return(network)
 }
 
