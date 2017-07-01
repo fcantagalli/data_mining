@@ -1,6 +1,8 @@
 #Load dataset
 setwd("~/Code/data_mining/MPL")
 source("MLP.R")
+require(MLmetrics)
+
 #dataset <- read.table("seed", header = FALSE)
 
 #simpleNetwork <- createNetwork(2,1,2)
@@ -18,20 +20,25 @@ source("MLP.R")
 
 #---------------------------------------------------------------
 set.seed(1)
-#dataset <- read.table("testdata", header= TRUE)
-dataset <- read.table("seed", header = FALSE)
+#dataset <- read.table("seed", header = FALSE)
+dataset <-read.table("winequality-red", header = TRUE)
 minmax <- datasetMinMax(dataset)
 dataset <- normalizeDataset(dataset, minmax)
 
 l_rate <- 0.4
-n_epoch <- 500
+n_epoch <- 10
 n_hidden <- 5
-#trainedNetwork <- trainNetwork(network, dataset, 0.5, 20, n_outputs)
-scores <- evaluateAlgorithm(dataset, trainTestMPL, l_rate, n_epoch, n_hidden)
-#print('Scores: %s' % scores)
-#print('Mean Accuracy: %.3f%%' % (sum(scores)/float(len(scores))))
+n_outputs <- 10
 
-require(MLmetrics)
+repeat {
+  if (n_epoch == 500) {
+    break;
+  }
+  scores <- evaluateAlgorithm(dataset, trainTestMPL, l_rate, n_epoch, n_hidden, n_outputs)
+  n_epoch <- n_epoch + 10
+}
+
+#print('Mean Accuracy: %.3f%', (sum(scores)/float(len(scores))))
 
 evaluateAlgorithm <- function (dataset, algorithm, ...) {
   # 75% treinamento 25% teste
@@ -43,19 +50,20 @@ evaluateAlgorithm <- function (dataset, algorithm, ...) {
   predicted <- algorithm(train_set, test_set, ...)
   actual <- test_set[,ncol(test_set)]
   accuracy <- Accuracy(y_pred = predicted, y_true = actual)
-  print(accuracy)
-  return(predicted, actual)
+  printf("Accuracy: %f", accuracy)
+  return(list(predicted = predicted, actual = actual))
 }
 
-trainTestMPL <- function(train, test, l_rate, n_epoch, n_hidden) {
+trainTestMPL <- function(train, test, l_rate, n_epoch, n_hidden, n_outputs = NA) {
   n_inputs <- ncol(train) - 1
-  n_outputs <- length(unique(train[,ncol(train)]))
+  if (is.na(n_outputs)) 
+    n_outputs <- length(unique(train[,ncol(train)]))
   network <- createNetwork(n_inputs, n_hidden, n_outputs)
   network <- trainNetwork(network, train, l_rate, n_epoch, n_outputs)
   predictions <- sapply(1:nrow(test), function (rowIndex) {
     rowTest <- test[rowIndex, -ncol(test)]
     predict(network, rowTest)
   })
-  print(predictions)
+  #print(predictions)
   return(predictions)
 }

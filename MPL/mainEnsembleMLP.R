@@ -16,7 +16,7 @@ minmax <- datasetMinMax(dataset)
 dataset <- normalizeDataset(dataset, minmax)
 
 n_classifiers <- 5
-l_rate <- 0.3
+l_rate <- 0.5
 n_epoch <- 400
 list_of_n_hidden <- c(5, 5, 5, 5, 5)
 
