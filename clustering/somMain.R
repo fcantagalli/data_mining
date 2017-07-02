@@ -103,3 +103,24 @@ plot(bin, main="Hexagonal Binning t48 Dataset")
 
 library(scatterplot3d)
 scatterplot3d(espiralDataset[,1],espiralDataset[,2],espiralDataset[,3], xlab="V1",  ylab = "V2", zlab = "V3", main="3D Scatterplot")
+
+## use hierarchical clustering to cluster the codebook vectors
+groups <- 6
+som.hc <- cutree(hclust(dist(som_model2$codes[, 1])), groups)
+plot(som_model2, type = "codes", bgcol = rainbow(groups)[som.hc])
+add.cluster.boundaries(som_model2, som.hc)
+# Colour palette definition
+pretty_palette <- c("#1f77b4", '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2')
+plot(som_model2, type = "mapping", bgcol = pretty_palette[som.hc], main = "Clusters")
+add.cluster.boundaries(som_model2, som.hc)
+
+#Viewing WCSS for   kmeans
+
+mydata <- som_model2$codes
+wss <- (nrow(mydata) - 1) * sum(apply(mydata, 2, var))
+#pontos dentro do intervalo
+for (i in 2:100) {
+    wss[i] <- sum(kmeans(mydata, centers = i)$withinss)
+}
+plot(wss,)
+
