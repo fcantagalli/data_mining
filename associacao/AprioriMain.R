@@ -2,6 +2,7 @@
 #tutorial: https://en.wikibooks.org/w/index.php?title=Data_Mining_Algorithms_In_R/Frequent_Pattern_Mining/The_Apriori_Algorithm
 #https://www.r-bloggers.com/association-rule-learning-and-the-apriori-algorithm/
 #pre processamento https://cran.r-project.org/doc/contrib/de_Jonge+van_der_Loo-Introduction_to_data_cleaning_with_R.pdf
+
 library(arules)
 library(arulesViz)
 
@@ -11,6 +12,8 @@ setwd("~/Code/data_mining/associacao")
 contraceptivoDataset <- as.matrix(read.csv("contraceptivo.csv", header = FALSE))
 t25Dataset <- read.table("T25I10D10", header = FALSE, skip = 1002)
 cogumeloDataSet<-read.csv("agaricuslepiota.txt", header = FALSE,na.string='?')
+
+
 #checar se ha missing na ou nan
 for (i in 1:ncol(cogumeloDataSet)) {
     print(table(is.na(cogumeloDataSet[, i])))
@@ -55,6 +58,7 @@ inspect(head(sort(rules, by = "lift"), 5))
 plot(rules)
 head(quality(rules))
 plot(rules, measure = c("support", "lift"), shading = "confidence")
+<<<<<<< HEAD
 plot(rules, shading = "order", control = list(main = "Two-key plot"))
 
 
@@ -86,7 +90,7 @@ plot(rules, shading = "order", control = list(main = "Two-key plot"))
 
 
 
-main()
+
 plot(rules, shading="order",control=list(main = "Two-key plot"))
 main()
 loadCongressDataset <- function() {
