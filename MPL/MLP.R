@@ -2,6 +2,14 @@
 
 #We will organize layers as arrays of dictionaries and treat the whole network as an array of layers.
 
+crossValidationSplit <- function(dataset, k_fold) {
+  foldSize <- floor(nrow(dataset) / k_fold)
+  folds <- sapply(1:k_fold, function(foldIndex) {
+    sample(1:nrow(dataset), size = foldSize, replace = FALSE)
+  })
+  return(folds)
+}
+
 datasetMinMax <- function(dataset) {
   minmax <- apply(X = dataset, MARGIN = 2, FUN = function(column) {
     return( list(min = min(column), max = max(column)) )
