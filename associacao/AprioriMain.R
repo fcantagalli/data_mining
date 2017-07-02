@@ -9,7 +9,6 @@ library(arulesViz)
 setwd("~/Code/data_mining/associacao")
 
 #preciso pesquisar como carregar os dados para o algoritmo
-t25Dataset <- read.table("T25I10D10", header = FALSE, skip = 1002)
 cogumeloDataSet<-read.csv("agaricuslepiota.txt", header = FALSE,na.string='?')
 
 
@@ -49,7 +48,7 @@ contraceptivoDataset <- as.matrix(read.csv("contraceptivo",
                                                              'raw',
                                                              'factor')))
 
-contraceptivoDataset = transform(contraceptivoDataset,
+dcontraceptivoDataset = transform(contraceptivoDataset,
                                    Wife_age = as.factor(Wife_age),
                                    Wife_education = as.factor(Wife_education),
                                    Husband_education = as.factor(Husband_education),
@@ -118,34 +117,43 @@ plot(rules)
 head(quality(rules))
 plot(rules, measure = c("support", "lift"), shading = "confidence")
 plot(rules, shading = "order", control = list(main = "Two-key plot"))
-
-
-
-loadT25Dataset <- function() {
-    textFile <- scan(file = "T25I10D10", what = "character", multi.line = TRUE, sep = '\n', skip = 1)
-    transactionLabels <- rep(0, 1000)
-    for (i in 1:1000) {
-        aux <- textFile[i]
-        aux <- strsplit(aux, " ", fixed = TRUE)
-        transactionLabels[as.numeric(aux[[1]][1])] <- aux[[1]][2]
-    }
-
-    transactions <- sapply(1002:(length(textFile) - 1), FUN = function(i) { textFile[i] })
-    return(list(labels = transactionLabels, data = transactions))
-}
 plot(rules, shading="order",control=list(main = "Two-key plot"))
 
+###########-------------------------------
+#Congress
+congressDataset <- loadCongressDataset()
+transac = as(dataset, "transactions")
+rules = apriori(congressDataset, parameter = list(support = 0.5, confidence = 0.3, minlen = 3))
+rules
+inspect(head(sort(rules, by = "lift"), 5))
+plot(rules)
+head(quality(rules))
+plot(rules, measure = c("support", "lift"), shading = "confidence")
+plot(rules, shading = "order", control = list(main = "Two-key plot"))
+
+
 loadCongressDataset <- function() {
-  dataset <- read.csv("congress", header = FALSE)
-  dataset$V2 <- sapply(dataset$V2, function (item) { paste("handicapped-infants-", item) })
-  dataset$V3 <- sapply(dataset$V3, function (item) { paste("handicapped-infants-", item) })
+  dataset <- read.csv("congress", header = FALSE, col.names = c(
+    "party", "handicapped-infants", "water-project-cost-sharing", "adoption-of-the-budget-resolution",
+    "physician-fee-freeze", "el-salvador-aid", "religious-groups-in-schools", "anti-satellite-test-ban",
+    "aid-to-nicaraguan-contras", "mx-missile", "immigration", "synfuels-corporation-cutback",
+    "education-spending", "superfund-right-to-sue", "crime", "duty-free-exports", "export-administration-act-south-africa"
+  ))
+  #dataset$V2 <- sapply(dataset$V2, function (item) { paste("handicapped-infants-", item) })
+  #dataset$V3 <- sapply(dataset$V3, function (item) { paste("handicapped-infants-", item) })
   for (column in names(dataset)) {
     dataset[,column] <- replace(as.character(dataset[,column]), dataset[,column] == "?", "absent")
   }
+  write.table(dataset, file = "congress.csv", sep = ",", quote = TRUE, row.names = FALSE)
+  dataset <- read.csv("congress.csv", header = FALSE, stringsAsFactors = TRUE ,col.names = c(
+    "party", "handicapped-infants", "water-project-cost-sharing", "adoption-of-the-budget-resolution",
+    "physician-fee-freeze", "el-salvador-aid", "religious-groups-in-schools", "anti-satellite-test-ban",
+    "aid-to-nicaraguan-contras", "mx-missile", "immigration", "synfuels-corporation-cutback",
+    "education-spending", "superfund-right-to-sue", "crime", "duty-free-exports", "export-administration-act-south-africa"
+  ))
   return(dataset)
 }
 
 concatStrings <- function(x2, x1) {
   paste(x1, x2)
 }
-main()
