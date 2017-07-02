@@ -8,19 +8,40 @@ library(arulesViz)
 setwd("~/Code/data_mining/associacao")
 
 #preciso pesquisar como carregar os dados para o algoritmo
-contraceptivoDataset <- read.csv("contraceptivo", header = FALSE)
-t25Dataset <- read.table("T25I10D10", header = FALSE, skip = 1002)
+contraceptivoDataset <- read.csv("contraceptivo", header = FALSE, stringsAsFactors = TRUE)
+t25Dataset <- loadT25Dataset()
 
-#checar se ha missing na ou nan
-for (i in 1:ncol(espiralDataset)) {
-  print(table(is.na(espiralDataset[,i])))
-  print(table(is.nan(espiralDataset[,i])))
-} #nao ha
 
 #Load Dataset
 #This one is just a mock dataset
-data("Adult")
+
 rules <- apriori(Adult, parameter = list(supp = 0.5, conf = 0.9, target = "rules"))
 summary(rules)
 
-main()
+
+loadT25Dataset <- function() {
+  textFile <- scan(file = "T25I10D10", what = "character", multi.line = TRUE, sep = '\n', skip = 1)
+  transactionLabels <- rep(0, 1000)
+  for (i in 1:1000) {
+    aux <- textFile[i]
+    aux <- strsplit(aux, " ", fixed = TRUE)
+    transactionLabels[as.numeric(aux[[1]][1])] <- aux[[1]][2]
+  }
+  
+  transactions <- sapply(1002:(length(textFile)-1), FUN = function(i) {textFile[i]})
+  return(list(labels = transactionLabels, data = transactions))
+}
+
+loadCongressDataset <- function() {
+  dataset <- read.csv("congress", header = FALSE)
+  dataset$V2 <- sapply(dataset$V2, function (item) { paste("handicapped-infants-", item) })
+  dataset$V3 <- sapply(dataset$V3, function (item) { paste("handicapped-infants-", item) })
+  for (column in names(dataset)) {
+    dataset[,column] <- replace(as.character(dataset[,column]), dataset[,column] == "?", "absent")
+  }
+  return(dataset)
+}
+
+concatStrings <- function(x2, x1) {
+  paste(x1, x2)
+}
