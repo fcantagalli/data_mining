@@ -8,9 +8,14 @@ library(arulesViz)
 setwd("~/Code/data_mining/associacao")
 
 #preciso pesquisar como carregar os dados para o algoritmo
-contraceptivoDataset <- read.csv("contraceptivo", header = FALSE, stringsAsFactors = TRUE)
+contraceptivoDataset <- as.matrix(read.csv("contraceptivoDataset", header = FALSE))
 t25Dataset <- loadT25Dataset()
 
+#checar se ha missing na ou nan
+for (i in 1:ncol(contraceptivoDataset)) {
+    print(table(is.na(contraceptivoDataset[, i])))
+    print(table(is.nan(contraceptivoDataset[, i])))
+} #nao ha
 
 #Load Dataset
 #This one is just a mock dataset
@@ -19,6 +24,14 @@ rules <- apriori(Adult, parameter = list(supp = 0.5, conf = 0.9, target = "rules
 summary(rules)
 
 
+write.table(contraceptivoDataset, file = "contraceptivo.csv", sep = ",", quote = TRUE, row.names = FALSE)
+# I intend to create a csv file, so I use 'sep=","' to separate the entries by a comma, 'quote=TRUE' to quote all the entries, and 'row.names=F to prevent the creation of an extra column containing the row names (which is the default behavior of write.table() )
+
+# Now place the dataset into a "data" directory (either via R or via the operating system, doesn't make any difference):
+ dir.create("data")
+# create the directory
+file.rename(from = "contraceptivo.csv", to = "data/contraceptivo.csv")
+# move the file
 loadT25Dataset <- function() {
   textFile <- scan(file = "T25I10D10", what = "character", multi.line = TRUE, sep = '\n', skip = 1)
   transactionLabels <- rep(0, 1000)
@@ -32,6 +45,18 @@ loadT25Dataset <- function() {
   return(list(labels = transactionLabels, data = transactions))
 }
 
+# Now we can finally load the dataset:
+data("contraceptivo")
+# data(mydataset) works as well, but quoted is preferable - less risk of conflic
+Contraceptivos = as(contraceptivo, "transactions")
+rules = apriori(Contraceptivos, parameter = list(support = 0.001, confidence = 0.001))
+rules
+inspect(head(sort(rules, by = "lift"), 5))
+plot(rules)
+head(quality(rules))
+plot(rules, measure = c("support", "lift"), shading = "confidence")
+plot(rules, shading="order",control=list(main = "Two-key plot"))
+main()
 loadCongressDataset <- function() {
   dataset <- read.csv("congress", header = FALSE)
   dataset$V2 <- sapply(dataset$V2, function (item) { paste("handicapped-infants-", item) })
