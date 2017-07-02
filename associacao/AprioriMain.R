@@ -19,7 +19,7 @@ for (i in 1:ncol(cogumeloDataSet)) {
 
 #Load Dataset
 #This one is just a mock dataset
-data("Adult")
+
 rules <- apriori(Adult, parameter = list(supp = 0.5, conf = 0.9, target = "rules"))
 summary(rules)
 
@@ -32,6 +32,18 @@ write.table(contraceptivoDataset, file = "contraceptivo.csv", sep = ",", quote =
 # create the directory
 file.rename(from = "contraceptivo.csv", to = "data/contraceptivo.csv")
 # move the file
+loadT25Dataset <- function() {
+  textFile <- scan(file = "T25I10D10", what = "character", multi.line = TRUE, sep = '\n', skip = 1)
+  transactionLabels <- rep(0, 1000)
+  for (i in 1:1000) {
+    aux <- textFile[i]
+    aux <- strsplit(aux, " ", fixed = TRUE)
+    transactionLabels[as.numeric(aux[[1]][1])] <- aux[[1]][2]
+  }
+  
+  transactions <- sapply(1002:(length(textFile)-1), FUN = function(i) {textFile[i]})
+  return(list(labels = transactionLabels, data = transactions))
+}
 
 # Now we can finally load the dataset:
 data("contraceptivo")
@@ -75,3 +87,18 @@ plot(rules, shading = "order", control = list(main = "Two-key plot"))
 
 
 main()
+plot(rules, shading="order",control=list(main = "Two-key plot"))
+main()
+loadCongressDataset <- function() {
+  dataset <- read.csv("congress", header = FALSE)
+  dataset$V2 <- sapply(dataset$V2, function (item) { paste("handicapped-infants-", item) })
+  dataset$V3 <- sapply(dataset$V3, function (item) { paste("handicapped-infants-", item) })
+  for (column in names(dataset)) {
+    dataset[,column] <- replace(as.character(dataset[,column]), dataset[,column] == "?", "absent")
+  }
+  return(dataset)
+}
+
+concatStrings <- function(x2, x1) {
+  paste(x1, x2)
+}
