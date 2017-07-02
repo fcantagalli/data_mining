@@ -9,10 +9,13 @@ require(kohonen)
 #Load dataset and prepare it
 
 setwd("~/Code/data_mining/clustering")
-espiralDataset <- read.table(file = "espiral", header = FALSE)
+espiralDataset <- read.table(file = "espiral",
+                            header = FALSE
+                            )
+plot(espiralDataset)
 #espiralDataset <-as.matrix( read.csv(file="C:/Users/li_fb/AppData/Local/Temp/espiral.txt.utf8", header=FALSE, row.names=NULL, encoding="UTF-8", sep="", dec=".", quote="\"", comment.char=""))
 t48Dataset <- read.table(file = "t48", header = FALSE)
-
+plot(t48Dataset)
 #checar se ha missing na ou nan
 for (i in 1:ncol(espiralDataset)) {
   print(table(is.na(espiralDataset[,i])))
@@ -53,17 +56,19 @@ som_model2 <- som(data_train_matrix2,
                  n.hood = "circular")
 #As the SOM training iterations progress, the distance from each node???s 
 #weights to the samples represented by that node is reduced.
-plot(som_model, type = "changes", main = "Changes - T48 Dataset")
+plot(som_model, type = "changes", main = "Changes - T48 Dataset", palette.name = rainbow)
 plot(som_model2, type = "changes", main = "Changes - Espiral Dataset")
 
 #visualise the count of how many samples are mapped to each node on the map.
 #Large values in some map areas suggests that a larger map would be benificial. 
 #Empty nodes indicate that your map size is too big for the number of samples.
-plot(som_model, type = "count" , main = "Count - T48 Dataset")
+plot(som_model, type = "count", main = "Count - T48 Dataset", palette.name =rainbow )
 plot(som_model2, type = "count", main = "Count - Espiral Dataset")
 
 #visualisation is of the distance between each node and its neighbours.
 plot(som_model, type = "dist.neighbours", palette.name = grey.colors, main = "Dist Neighbours - T48 Dataset")
+plot(som_model, type = "dist.neighbours", palette.name = rainbow, main = "Dist Neighbours - T48 Dataset")
+
 plot(som_model2, type = "dist.neighbours", palette.name = grey.colors, main = "Dist Neighbours - Espiral Dataset")
 
 plot(som_model, type = "codes", main = "Codes - T48 Dataset")
@@ -124,3 +129,23 @@ for (i in 2:100) {
 }
 plot(wss,)
 
+
+## use hierarchical clustering to cluster the codebook vectors
+groups <- 6
+som.hc <- cutree(hclust(dist(som_model$codes[, 1])), groups)
+plot(som_model, type = "codes", bgcol = rainbow(groups)[som.hc])
+add.cluster.boundaries(som_model, som.hc)
+# Colour palette definition
+pretty_palette <- c("#1f77b4", '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2')
+plot(som_model, type = "mapping", bgcol = pretty_palette[som.hc], main = "Clusters")
+add.cluster.boundaries(som_model, som.hc)
+
+#Viewing WCSS for   kmeans
+
+mydata <- som_model$codes
+wss <- (nrow(mydata) - 1) * sum(apply(mydata, 2, var))
+#pontos dentro do intervalo
+for (i in 2:100) {
+    wss[i] <- sum(kmeans(mydata, centers = i)$withinss)
+}
+plot(wss,)
