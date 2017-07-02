@@ -34,7 +34,14 @@ file.rename(from = "contraceptivo.csv", to = "data/contraceptivo.csv")
 # move the file
 
 # Now we can finally load the dataset:
-data("contraceptivoDataset")
+data("contraceptivo")
 # data(mydataset) works as well, but quoted is preferable - less risk of conflic
-
+Contraceptivos = as(contraceptivo, "transactions")
+rules = apriori(Contraceptivos, parameter = list(support = 0.001, confidence = 0.001))
+rules
+inspect(head(sort(rules, by = "lift"), 5))
+plot(rules)
+head(quality(rules))
+plot(rules, measure = c("support", "lift"), shading = "confidence")
+plot(rules, shading="order",control=list(main = "Two-key plot"))
 main()
