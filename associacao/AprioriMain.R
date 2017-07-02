@@ -12,9 +12,9 @@ contraceptivoDataset <- read.csv("contraceptivo", header = FALSE)
 t25Dataset <- read.table("T25I10D10", header = FALSE, skip = 1002)
 
 #checar se ha missing na ou nan
-for (i in 1:ncol(espiralDataset)) {
-  print(table(is.na(espiralDataset[,i])))
-  print(table(is.nan(espiralDataset[,i])))
+for (i in 1:ncol(contraceptivoDataset)) {
+    print(table(is.na(contraceptivoDataset[, i])))
+    print(table(is.nan(contraceptivoDataset[, i])))
 } #nao ha
 
 #Load Dataset
