@@ -9,7 +9,6 @@ library(arulesViz)
 setwd("~/Code/data_mining/associacao")
 
 #preciso pesquisar como carregar os dados para o algoritmo
-contraceptivoDataset <- as.matrix(read.csv("contraceptivo.csv", header = FALSE))
 t25Dataset <- read.table("T25I10D10", header = FALSE, skip = 1002)
 cogumeloDataSet<-read.csv("agaricuslepiota.txt", header = FALSE,na.string='?')
 
@@ -22,43 +21,75 @@ for (i in 1:ncol(cogumeloDataSet)) {
 
 #Load Dataset
 #This one is just a mock dataset
-
+data("Adult")
 rules <- apriori(Adult, parameter = list(supp = 0.5, conf = 0.9, target = "rules"))
 summary(rules)
 
 ##############################################################################
-write.table(contraceptivoDataset, file = "contraceptivo.csv", sep = ",", quote = TRUE, row.names = FALSE)
+contraceptivoDataset <- as.matrix(read.csv("contraceptivo",
+                                            header = TRUE,
+                                            col.names = c("Wife_age", 
+                                                           "Wife_education",
+                                                           "Husband_education",
+                                                           "Number_children_born",
+                                                           "Wife_religion",
+                                                           "Wife_working",
+                                                           "Husband_occupation",
+                                                           "Standard_living_index",
+                                                           "Media_exposure",
+                                                           "Contraceptive_used"),
+                                              colClasses = c('numeric',
+                                                             'factor',
+                                                             'factor',
+                                                             'numeric',
+                                                             'raw',
+                                                             'raw',
+                                                             'factor',
+                                                             'factor',
+                                                             'raw',
+                                                             'factor')))
+
+contraceptivoDataset = transform(contraceptivoDataset,
+                                   Wife_age = as.factor(Wife_age),
+                                   Wife_education = as.factor(Wife_education),
+                                   Husband_education = as.factor(Husband_education),
+                                   Number_children_born = as.factor(Number_children_born),
+                                   Wife_religion = as.factor(Wife_religion),
+                                   Wife_working = as.factor(Wife_working),
+                                    Husband_occupation = as.factor(Husband_occupation),
+                                    Standard_living_index = as.factor(Standard_living_index),
+                                    Media_exposure = as.factor(Media_exposure),
+                                    Contraceptive_used = as.factor(Contraceptive_used))
+
+                                   
+        
+for (i in 1:ncol(contraceptivoDataset)) {
+    print(table(is.na(contraceptivoDataset[, i])))
+    print(table(is.nan(contraceptivoDataset[, i])))
+}
+#data_train_matrix <- as.matrix(scale(contraceptivoDataset))
+print(contraceptivoDataset)
+
+#write.table(contraceptivoDataset, file = "contraceptivo.csv", sep = ",", quote = TRUE, row.names = FALSE)
 # I intend to create a csv file, so I use 'sep=","' to separate the entries by a comma, 'quote=TRUE' to quote all the entries, and 'row.names=F to prevent the creation of an extra column containing the row names (which is the default behavior of write.table() )
 
 # Now place the dataset into a "data" directory (either via R or via the operating system, doesn't make any difference):
- dir.create("data")
+ #dir.create("data")
 # create the directory
-file.rename(from = "contraceptivo.csv", to = "data/contraceptivo.csv")
+#file.rename(from = "contraceptivo.csv", to = "data/contraceptivo.csv")
 # move the file
-loadT25Dataset <- function() {
-  textFile <- scan(file = "T25I10D10", what = "character", multi.line = TRUE, sep = '\n', skip = 1)
-  transactionLabels <- rep(0, 1000)
-  for (i in 1:1000) {
-    aux <- textFile[i]
-    aux <- strsplit(aux, " ", fixed = TRUE)
-    transactionLabels[as.numeric(aux[[1]][1])] <- aux[[1]][2]
-  }
-  
-  transactions <- sapply(1002:(length(textFile)-1), FUN = function(i) {textFile[i]})
-  return(list(labels = transactionLabels, data = transactions))
-}
+
 
 # Now we can finally load the dataset:
-data("contraceptivo")
+#data("contraceptivo")
 # data(mydataset) works as well, but quoted is preferable - less risk of conflic
-Contraceptivos = as(contraceptivo, "transactions")
-rules = apriori(Contraceptivos, parameter = list(support = 0.001, confidence = 0.001))
+#Contraceptivos = as(contraceptivo, "transactions")
+rules = apriori(contraceptivoDataset, parameter = list(support = 0.5, confidence = 0.4, minlen = 3))
 rules
 inspect(head(sort(rules, by = "lift"), 5))
 plot(rules)
 head(quality(rules))
 plot(rules, measure = c("support", "lift"), shading = "confidence")
-<<<<<<< HEAD
 plot(rules, shading = "order", control = list(main = "Two-key plot"))
 
 
@@ -90,9 +121,20 @@ plot(rules, shading = "order", control = list(main = "Two-key plot"))
 
 
 
+loadT25Dataset <- function() {
+    textFile <- scan(file = "T25I10D10", what = "character", multi.line = TRUE, sep = '\n', skip = 1)
+    transactionLabels <- rep(0, 1000)
+    for (i in 1:1000) {
+        aux <- textFile[i]
+        aux <- strsplit(aux, " ", fixed = TRUE)
+        transactionLabels[as.numeric(aux[[1]][1])] <- aux[[1]][2]
+    }
 
+    transactions <- sapply(1002:(length(textFile) - 1), FUN = function(i) { textFile[i] })
+    return(list(labels = transactionLabels, data = transactions))
+}
 plot(rules, shading="order",control=list(main = "Two-key plot"))
-main()
+
 loadCongressDataset <- function() {
   dataset <- read.csv("congress", header = FALSE)
   dataset$V2 <- sapply(dataset$V2, function (item) { paste("handicapped-infants-", item) })
@@ -106,3 +148,4 @@ loadCongressDataset <- function() {
 concatStrings <- function(x2, x1) {
   paste(x1, x2)
 }
+main()
