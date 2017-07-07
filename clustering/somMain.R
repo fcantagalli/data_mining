@@ -8,6 +8,7 @@ library(kohonen)
 require(kohonen)
 #Load dataset and prepare it
 
+
 setwd("~/Code/data_mining/clustering")
 espiralDataset <- read.table(file = "espiral",
                             header = FALSE
