@@ -20,38 +20,45 @@ require(MLmetrics)
 
 #---------------------------------------------------------------
 set.seed(1)
-#dataset <- read.table("seed", header = FALSE)
-dataset <-read.table("winequality-red", header = TRUE)
+dataset <- read.table("seed", header = FALSE)
+#dataset <-read.table("winequality-red", header = TRUE)
 minmax <- datasetMinMax(dataset)
 dataset <- normalizeDataset(dataset, minmax)
 
 l_rate <- 0.4
-n_epoch <- 10
+n_epoch <- 100
 n_hidden <- 5
-n_outputs <- 10
+n_outputs <- 3
 
 repeat {
   if (n_epoch == 500) {
     break;
   }
-  scores <- evaluateAlgorithm(dataset, trainTestMPL, l_rate, n_epoch, n_hidden, n_outputs)
+  scores <- evaluateAlgorithm(dataset, trainTestMPL, k_fold, l_rate, n_epoch, n_hidden, n_outputs)
   n_epoch <- n_epoch + 10
 }
 
 #print('Mean Accuracy: %.3f%', (sum(scores)/float(len(scores))))
 
-evaluateAlgorithm <- function (dataset, algorithm, ...) {
+evaluateAlgorithm <- function (dataset, algorithm, k_fold, ...) {
   # 75% treinamento 25% teste
-  sample_size <- floor(0.75 * nrow(dataset))
-  train_set_indexes <- sample(seq_len(nrow(dataset)), size = sample_size)
-  train_set <- dataset[train_set_indexes,]
-  test_set <- dataset[-train_set_indexes,]
-  
-  predicted <- algorithm(train_set, test_set, ...)
-  actual <- test_set[,ncol(test_set)]
-  accuracy <- Accuracy(y_pred = predicted, y_true = actual)
-  printf("Accuracy: %f", accuracy)
-  return(list(predicted = predicted, actual = actual))
+  folds <- crossValidationSplit(dataset, k_fold)
+  #sample_size <- floor(0.75 * nrow(dataset))
+  #train_set_indexes <- sample(seq_len(nrow(dataset)), size = sample_size)
+  scores <- list
+  accuracies <- rep(0, k_fold)
+  scores <- lapply(1:ncol(folds), function(i) {
+    fold <- folds[,i]
+    test_set <- dataset[fold,]
+    train_set <- dataset[-fold,]
+    predicted <- algorithm(train_set, test_set, ...)
+    actual <- test_set[,ncol(test_set)]
+    accuracies[i] <<- Accuracy(y_pred = predicted, y_true = actual)
+    printf("Accuracy: %f", accuracies[i])
+    list(predicted = predicted, actual = actual)
+  })
+  printf("Agv accuracy: %f", sum(accuracies) / k_fold)
+  return(scores)
 }
 
 trainTestMPL <- function(train, test, l_rate, n_epoch, n_hidden, n_outputs = NA) {
