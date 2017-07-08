@@ -11,9 +11,12 @@ require(kohonen)
 
 setwd("~/Code/data_mining/clustering")
 espiralDataset <- read.table(file = "espiral",
-                            header = FALSE
-                            )
+                            header = FALSE)
+
+library(scatterplot3d)
+scatterplot3d(espiralDataset[,1],espiralDataset[,2],espiralDataset[,3], xlab="V1",  ylab = "V2", zlab = "V3", main="3D Scatterplot")
 plot(espiralDataset)
+
 #espiralDataset <-as.matrix( read.csv(file="C:/Users/li_fb/AppData/Local/Temp/espiral.txt.utf8", header=FALSE, row.names=NULL, encoding="UTF-8", sep="", dec=".", quote="\"", comment.char=""))
 t48Dataset <- read.table(file = "t48", header = FALSE)
 plot(t48Dataset)
@@ -107,8 +110,7 @@ library(hexbin)
 bin<-hexbin(t48Dataset[,1], t48Dataset[,2], xbins=35)
 plot(bin, main="Hexagonal Binning t48 Dataset") 
 
-library(scatterplot3d)
-scatterplot3d(espiralDataset[,1],espiralDataset[,2],espiralDataset[,3], xlab="V1",  ylab = "V2", zlab = "V3", main="3D Scatterplot")
+
 
 ## use hierarchical clustering to cluster the codebook vectors
 groups <- 6

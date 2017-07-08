@@ -144,19 +144,12 @@ trainNetwork <- function(network, train_dataset, l_rate, n_epoch, n_outputs) {
       outputs <- getNetworkOutputs(network)
       expected <- rep(0, n_outputs)
       expected[row[length(row)]] <- 1
-      #print(row[length(row)])
-      #print(expected)
-      #print(outputs)
       sum_error <- sum_error + sum((expected - outputs)^2)
       network <- backwardPropagateError(network, expected)
       network <- updateNetworkWeights(network, row, l_rate)
     }
-    
-    #if (sum_error < 3.00) {
-    #  break;
-    #}
+    printf('>epoch=%d, lrate=%.3f, error=%.3f',epoch, l_rate, sum_error)
   }
-  printf('>epoch=%d, lrate=%.3f, error=%.3f',epoch, l_rate, sum_error)
   return(network)
 }
 

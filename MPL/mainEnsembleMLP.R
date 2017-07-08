@@ -3,22 +3,16 @@ setwd("~/Code/data_mining/MPL")
 
 require(MLmetrics)
 source("MLP.R")
+set.seed(seed = NULL)
+#dataset <- read.table("seed", header = FALSE)
+dataset <- MLP.loadSpambaseDatset()
+winequalityDataset <- read.table("winequality-red", header = TRUE)
 
-set.seed(1)
-dataset <- read.table("seed", header = FALSE)
-#spambaseDataset <- read.csv("spambase", header = FALSE)
-#winequalityDataset <- read.table("winequality-red", header = TRUE)
 
-#EN.checkForMissingValues(dataset)
-
-#process dataset to normalize it
-minmax <- datasetMinMax(dataset)
-dataset <- normalizeDataset(dataset, minmax)
-
-n_classifiers <- 5
-l_rate <- 0.5
-n_epoch <- 400
-list_of_n_hidden <- c(5, 5, 5, 5, 5)
+n_classifiers <- 3
+l_rate <- 0.3
+n_epoch <- 120
+list_of_n_hidden <- c(6, 10, 12)
 
 scores <- EN.evaluateAlgorithm(dataset, EN.trainTestEnsembleMPL, n_classifiers, l_rate, n_epoch, list_of_n_hidden)
 
@@ -28,7 +22,6 @@ EN.evaluateAlgorithm <- function (dataset, algorithm, ...) {
   train_set_indexes <- sample(seq_len(nrow(dataset)), size = sample_size)
   train_set <- dataset[train_set_indexes,]
   test_set <- dataset[-train_set_indexes,]
-  
   predicted <- algorithm(train_set, test_set, ...)
   actual <- test_set[,ncol(test_set)]
   accuracy <- Accuracy(y_pred = predicted, y_true = actual)
