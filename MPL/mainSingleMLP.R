@@ -20,51 +20,84 @@ require(MLmetrics)
 
 #---------------------------------------------------------------
 set.seed(1)
-dataset <- read.table("seed", header = FALSE)
+#dataset <- read.table("seed", header = FALSE)
 #dataset <-read.table("winequality-red", header = TRUE)
-minmax <- datasetMinMax(dataset)
-dataset <- normalizeDataset(dataset, minmax)
+dataset <- MLP.loadSpambaseDatset()
 
 l_rate <- 0.4
-n_epoch <- 100
-n_hidden <- 5
-n_outputs <- 3
+n_epoch <- 10
+n_hidden <- 16
 
 repeat {
   if (n_epoch == 500) {
     break;
   }
-  scores <- evaluateAlgorithm(dataset, trainTestMPL, k_fold, l_rate, n_epoch, n_hidden, n_outputs)
+  scores <- evaluateAlgorithm(dataset, trainTestMPL, l_rate, n_epoch, n_hidden)
   n_epoch <- n_epoch + 10
 }
 
 #print('Mean Accuracy: %.3f%', (sum(scores)/float(len(scores))))
 
-evaluateAlgorithm <- function (dataset, algorithm, k_fold, ...) {
+testForSpambase <- function (l_rate) {
+  set.seed(1)
+  #dataset <- read.table("seed", header = FALSE)
+  #dataset <-read.table("winequality-red", header = TRUE)
+  dataset <- MLP.loadSpambaseDatset()
+  
+  l_rate <- 0.4
+  n_epoch <- 30
+  n_hidden <- 2
+  
+  repeat {
+    if (n_hidden == 58) {
+      break;
+    }
+    printf("n_hidden: %d",n_hidden)
+    scores <- evaluateAlgorithm(dataset, trainTestMPL, l_rate, n_epoch, n_hidden)
+    n_hidden <- n_hidden + 2
+  }
+}
+
+testForWine <- function () {
+  set.seed(1)
+  dataset <-read.table("winequality-red", header = TRUE)
+  minmax <- datasetMinMax(dataset)
+  dataset <- normalizeDataset(dataset, minmax)
+  
+  l_rate <- 0.4
+  n_epoch <- 150
+  n_hidden <- 2
+  n_output <- 10
+  
+  repeat {
+    if (n_hidden == 58) {
+      break;
+    }
+    printf("n_hidden: %d",n_hidden)
+    scores <- evaluateAlgorithm(dataset, trainTestMPL, l_rate, n_epoch, n_hidden, n_output)
+    n_hidden <- n_hidden + 2
+  }
+}
+
+evaluateAlgorithm <- function (dataset, algorithm, ...) {
   # 75% treinamento 25% teste
-  folds <- crossValidationSplit(dataset, k_fold)
-  #sample_size <- floor(0.75 * nrow(dataset))
-  #train_set_indexes <- sample(seq_len(nrow(dataset)), size = sample_size)
-  scores <- list
-  accuracies <- rep(0, k_fold)
-  scores <- lapply(1:ncol(folds), function(i) {
-    fold <- folds[,i]
-    test_set <- dataset[fold,]
-    train_set <- dataset[-fold,]
-    predicted <- algorithm(train_set, test_set, ...)
-    actual <- test_set[,ncol(test_set)]
-    accuracies[i] <<- Accuracy(y_pred = predicted, y_true = actual)
-    printf("Accuracy: %f", accuracies[i])
-    list(predicted = predicted, actual = actual)
-  })
-  printf("Agv accuracy: %f", sum(accuracies) / k_fold)
-  return(scores)
+  sample_size <- floor(0.75 * nrow(dataset))
+  train_set_indexes <- sample(seq_len(nrow(dataset)), size = sample_size)
+  train_set <- dataset[train_set_indexes,]
+  test_set <- dataset[-train_set_indexes,]
+  
+  predicted <- algorithm(train_set, test_set, ...)
+  actual <- test_set[,ncol(test_set)]
+  accuracy <- Accuracy(y_pred = predicted, y_true = actual)
+  printf("Accuracy: %f", accuracy)
+  return(list(predicted = predicted, actual = actual))
 }
 
 trainTestMPL <- function(train, test, l_rate, n_epoch, n_hidden, n_outputs = NA) {
   n_inputs <- ncol(train) - 1
   if (is.na(n_outputs)) 
     n_outputs <- length(unique(train[,ncol(train)]))
+  set.seed(1)
   network <- createNetwork(n_inputs, n_hidden, n_outputs)
   network <- trainNetwork(network, train, l_rate, n_epoch, n_outputs)
   predictions <- sapply(1:nrow(test), function (rowIndex) {
@@ -73,4 +106,14 @@ trainTestMPL <- function(train, test, l_rate, n_epoch, n_hidden, n_outputs = NA)
   })
   #print(predictions)
   return(predictions)
+}
+
+MLP.loadSpambaseDatset <- function () {
+  dataset <- read.csv("spambase", header = FALSE)
+  minmax <- datasetMinMax(dataset)
+  dataset <- normalizeDataset(dataset, minmax)
+  for (i in 1:nrow(dataset)) {
+    dataset[i, ncol(dataset)] <- dataset[i, ncol(dataset)] + 1
+  }
+  return(dataset)
 }
