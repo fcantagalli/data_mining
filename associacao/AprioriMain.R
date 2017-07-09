@@ -62,9 +62,9 @@ dcontraceptivoDataset = transform(contraceptivoDataset,
 
                                    
         
-for (i in 1:ncol(contraceptivoDataset)) {
-    print(table(is.na(contraceptivoDataset[, i])))
-    print(table(is.nan(contraceptivoDataset[, i])))
+for (i in 1:ncol(dcontraceptivoDataset)) {
+    print(table(is.na(dcontraceptivoDataset[, i])))
+    print(table(is.nan(dcontraceptivoDataset[, i])))
 }
 #data_train_matrix <- as.matrix(scale(contraceptivoDataset))
 print(contraceptivoDataset)
@@ -83,13 +83,115 @@ print(contraceptivoDataset)
 #data("contraceptivo")
 # data(mydataset) works as well, but quoted is preferable - less risk of conflic
 #Contraceptivos = as(contraceptivo, "transactions")
-rules = apriori(contraceptivoDataset, parameter = list(support = 0.5, confidence = 0.4, minlen = 3))
+rules = apriori(dcontraceptivoDataset, parameter = list(support = 1, confidence = 1, minlen = 2))
 rules
-inspect(head(sort(rules, by = "lift"), 5))
 plot(rules)
+inspect(head(sort(rules, by = "lift"), 250))
 head(quality(rules))
+inspect(head(sort(rules, by = "lift"), 250))
 plot(rules, measure = c("support", "lift"), shading = "confidence")
 plot(rules, shading = "order", control = list(main = "Two-key plot"))
+plot(rules, method = "grouped", measure = c("support"), shadding = "confidence")
+
+#sem alteração nos resultados
+rules = apriori(dcontraceptivoDataset, parameter = list(support = 0.9, confidence = 0.9, minlen = 2))
+rules
+plot(rules)
+head(quality(rules))
+inspect(head(sort(rules, by = "lift"), 250))
+plot(rules, measure = c("support", "lift"), shading = "confidence")
+plot(rules, shading = "order", control = list(main = "Two-key plot"))
+
+#sem altereções
+rules = apriori(dcontraceptivoDataset, parameter = list(support = 0.8, confidence = 0.8, minlen = 2))
+rules
+plot(rules)
+head(quality(rules))
+inspect(head(sort(rules, by = "lift"), 250))
+plot(rules, measure = c("support", "lift"), shading = "confidence")
+plot(rules, shading = "order", control = list(main = "Two-key plot"))
+
+
+rules = apriori(dcontraceptivoDataset, parameter = list(support = 0.7, confidence = 0.7, minlen = 2))
+rules
+plot(rules)
+head(quality(rules))
+inspect(head(sort(rules, by = "lift"), 250))
+plot(rules, measure = c("support", "lift"), shading = "confidence")
+plot(rules, shading = "order", control = list(main = "Two-key plot"))
+plot(rules, method = "grouped", measure = c("support"), shadding = "confidence")
+
+rules = apriori(dcontraceptivoDataset, parameter = list(support = 0.6, confidence = 0.6, minlen = 2))
+rules
+plot(rules)
+head(quality(rules))
+inspect(head(sort(rules, by = "support"), 250))
+plot(rules, measure = c("support", "lift"), shading = "confidence")
+plot(rules, shading = "order", control = list(main = "Two-key plot"))
+plot(rules, method = "grouped", measure = c("support"), shadding = "confidence")
+
+
+rules = apriori(dcontraceptivoDataset, parameter = list(support = 0.4, confidence = 0.4, maxlen = 2, minlen=2))
+rules
+plot(rules)
+head(quality(rules))
+inspect(head(sort(rules, by = "support"), 250))
+plot(rules, measure = c("support", "lift"), shading = "confidence")
+plot(rules, shading = "order", control = list(main = "Two-key plot"))
+plot(rules, method = "grouped", measure = c("support"), shadding = "confidence")
+plot(rules, method = "matrix", measure = c("support"))
+
+rules = apriori(dcontraceptivoDataset, parameter = list(support = 1, confidence = 1, minlen = 3))
+rules
+plot(rules)
+head(quality(rules))
+inspect(head(sort(rules, by = "support"), 250))
+plot(rules, measure = c("support", "lift"), shading = "confidence")
+plot(rules, shading = "order", control = list(main = "Two-key plot"))
+plot(rules, method = "grouped", measure = c("support"), shadding = "confidence")
+
+
+
+
+
+rules = apriori(dcontraceptivoDataset, parameter = list(support = 0.7, confidence = 0.7, minlen = 3))
+rules
+plot(rules)
+head(quality(rules))
+inspect(head(sort(rules, by = "support"), 250))
+plot(rules, measure = c("support", "lift"), shading = "confidence")
+plot(rules, shading = "order", control = list(main = "Two-key plot"))
+plot(rules, method = "grouped", measure = c("support"), shadding = "confidence")
+
+
+rules = apriori(dcontraceptivoDataset, parameter = list(support = 0.6, confidence = 0.6, minlen = 3))
+rules
+plot(rules)
+head(quality(rules))
+inspect(head(sort(rules, by = "support"), 250))
+plot(rules, measure = c("support", "lift"), shading = "confidence")
+plot(rules, shading = "order", control = list(main = "Two-key plot"))
+plot(rules, method = "grouped", measure = c("support"), shadding = "confidence")
+
+
+rules = apriori(dcontraceptivoDataset, parameter = list(support = 0.3, confidence = 0.3, minlen = 3))
+rules
+plot(rules)
+head(quality(rules))
+inspect(head(sort(rules, by = "support"), 250))
+plot(rules, measure = c("support", "lift"), shading = "confidence")
+plot(rules, shading = "order", control = list(main = "Two-key plot"))
+plot(rules, method = "grouped", measure = c("support"), shadding = "confidence")
+
+rules = apriori(dcontraceptivoDataset, parameter = list(support = 0.35, confidence = 0.6, minlen = 5))
+rules
+plot(rules)
+head(quality(rules))
+inspect(head(sort(rules, by = "support"), 250))
+plot(rules, measure = c("support", "lift"), shading = "confidence")
+plot(rules, shading = "order", control = list(main = "Two-key plot"))
+plot(rules, method = "grouped", measure = c("support"), shadding = "confidence")
+
 
 
 
